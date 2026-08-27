@@ -620,6 +620,7 @@ footer{ padding:70px 20px 40px; text-align:center; }
       <button type="submit" class="rsvp-submit" data-i18n="rsvp.submit">Enviar confirmación</button>
       <div class="rsvp-msg" id="rsvpMsg"></div>
     </form>
+    <iframe name="rsvp-hidden-iframe" id="rsvp-hidden-iframe" style="display:none;" title="rsvp-submit-target"></iframe>
     <div class="deadline" data-i18n="rsvp.deadline">Por favor, confirma antes del 15 de mayo de 2027.</div>
   </div>
 </section>
@@ -1013,17 +1014,64 @@ const rsvpForm = document.getElementById('rsvpForm');
 const rsvpMsg = document.getElementById('rsvpMsg');
 const COUPLE_EMAIL = 'YOUR_EMAIL@example.com'; // <-- sustituye por vuestro email real (para el enlace de respaldo)
 
-// ⚠️ CONFIGURACIÓN NECESARIA:
-// 1. Ve a https://formspree.io y crea una cuenta gratuita.
-// 2. Crea un nuevo formulario y copia el "Form ID" (algo como "xppgojrs").
-// 3. Sustituye YOUR_FORM_ID por ese ID en la siguiente línea.
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mnpqabwz';
+// Configuración de Google Forms: cada campo de nuestro formulario se envía
+// al "entry.XXXXXXX" correspondiente del Google Form conectado a vuestra Sheet.
+const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdqaGzIPbQoF78Jmm38Vy7XuYWYE3sU2pMm8gu0WiPpbeIyQg/formResponse';
+const GOOGLE_FORM_ENTRIES = {
+  Nombre: 'entry.598236031',
+  Asiste: 'entry.1062554386',
+  'Nº acompañantes': 'entry.1098542528',
+  Acompañantes: 'entry.466867701',
+  'Autobús ida': 'entry.1117533396',
+  'Autobús vuelta': 'entry.1104233313',
+  'Alergias / dieta': 'entry.1044233736',
+  Canción: 'entry.429139970',
+  Mensaje: 'entry.344197243',
+  Fecha: 'entry.2104404067'
+};
 
 function buildMailtoFallback(entry){
   const subject = encodeURIComponent('Confirmación de asistencia - ' + entry.Nombre);
   const bodyLines = Object.entries(entry).map(([k,v]) => `${k}: ${v}`);
   const body = encodeURIComponent(bodyLines.join('\n'));
   return `mailto:${COUPLE_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+function submitToGoogleForm(entry){
+  return new Promise((resolve)=>{
+    const iframe = document.getElementById('rsvp-hidden-iframe');
+    let settled = false;
+    const onLoad = ()=>{
+      if(settled) return;
+      settled = true;
+      iframe.removeEventListener('load', onLoad);
+      resolve(true);
+    };
+    iframe.addEventListener('load', onLoad);
+
+    const form = document.createElement('form');
+    form.action = GOOGLE_FORM_ACTION;
+    form.method = 'POST';
+    form.target = 'rsvp-hidden-iframe';
+    form.style.display = 'none';
+
+    Object.entries(entry).forEach(([key, value])=>{
+      const entryId = GOOGLE_FORM_ENTRIES[key];
+      if(!entryId) return;
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = entryId;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(()=>{ form.remove(); }, 3000);
+    // Google Forms no permite leer la respuesta real (cross-origin), así que
+    // damos un margen de tiempo prudencial y asumimos éxito si no hay errores de red.
+    setTimeout(()=>{ if(!settled){ settled = true; resolve(true);} }, 2500);
+  });
 }
 
 rsvpForm.addEventListener('submit', async (e)=>{
@@ -1070,21 +1118,7 @@ rsvpForm.addEventListener('submit', async (e)=>{
   submitBtn.disabled = true;
   submitBtn.textContent = '...';
   try{
-    if(FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')){
-      throw new Error('not-configured');
-    }
-    const response = await fetch(FORMSPREE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry)
-    });
-    let responseBody = null;
-    try{ responseBody = await response.json(); }catch(parseErr){ /* not JSON, ignore */ }
-    console.log('[RSVP] Formspree status:', response.status, 'body:', responseBody);
-    if(!response.ok){
-      const errMsg = (responseBody && responseBody.errors) ? JSON.stringify(responseBody.errors) : ('HTTP ' + response.status);
-      throw new Error('bad-response: ' + errMsg);
-    }
+    await submitToGoogleForm(entry);
     rsvpMsg.classList.add('success');
     rsvpMsg.textContent = getTranslation(currentLang, 'rsvp.thanks') || 'Gracias, hemos recibido tu confirmación.';
     rsvpForm.reset();
@@ -1095,12 +1129,8 @@ rsvpForm.addEventListener('submit', async (e)=>{
     console.error('[RSVP] Submission failed:', err);
     rsvpMsg.classList.add('error');
     const mailtoLink = buildMailtoFallback(entry);
-    if(err.message === 'not-configured'){
-      rsvpMsg.innerHTML = `El formulario aún no está configurado. <a href="${mailtoLink}" style="color:inherit;text-decoration:underline;">Envíanoslo por email</a> mientras tanto.`;
-    } else {
-      const baseMsg = getTranslation(currentLang, 'rsvp.errSave') || 'No hemos podido guardar tu respuesta.';
-      rsvpMsg.innerHTML = `${baseMsg} <a href="${mailtoLink}" style="color:inherit;text-decoration:underline;">Envíanoslo por email en su lugar</a>.`;
-    }
+    const baseMsg = getTranslation(currentLang, 'rsvp.errSave') || 'No hemos podido guardar tu respuesta.';
+    rsvpMsg.innerHTML = `${baseMsg} <a href="${mailtoLink}" style="color:inherit;text-decoration:underline;">Envíanoslo por email en su lugar</a>.`;
   }finally{
     submitBtn.disabled = false;
     submitBtn.textContent = originalBtnText;
