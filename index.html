@@ -288,6 +288,16 @@ footer{ position:relative; overflow:hidden;}
   border:1px solid rgba(185,139,62,.4); border-radius:6px; padding:12px 16px;
 }
 
+/* GIFT (inside FAQ) */
+.gift-box{
+  margin-top:16px; background:var(--paper-2); border:1px solid var(--line); border-radius:6px; padding:24px 26px;
+  display:flex; flex-direction:column; gap:4px; text-align:left;
+}
+.gift-row{ display:flex; justify-content:space-between; gap:20px; font-size:14.5px; padding:7px 0; border-bottom:1px solid var(--line);}
+.gift-row:last-child{border-bottom:none;}
+.gift-label{color:var(--ink-soft);}
+.gift-value{ font-family:'Fraunces',serif; letter-spacing:.03em;}
+
 /* GUEST / COMPANION SUBFORMS */
 .guest-forms{ display:flex; flex-direction:column; gap:16px; margin-top:4px;}
 .guest-card{
@@ -554,6 +564,14 @@ footer{ padding:70px 20px 40px; text-align:center; }
         <div class="faq-q" data-i18n="faq.q4">¿Cómo llego a la finca?</div>
         <div class="faq-a" data-i18n="faq.a4">Respuesta</div>
       </div>
+      <div class="faq-item">
+        <div class="faq-q" data-i18n="faq.q5">¿Os apetece hacernos un regalo?</div>
+        <div class="faq-a" data-i18n="faq.a5">Con que vengáis ya nos hacéis el mejor regalo. Pero si os apetece tener un detalle con nosotros, aquí tenéis nuestros datos:</div>
+        <div class="gift-box">
+          <div class="gift-row"><span class="gift-label" data-i18n="regalo.iban">IBAN</span><span class="gift-value">ES48 0182 5322 2400 0218 6434</span></div>
+          <div class="gift-row"><span class="gift-label" data-i18n="regalo.banco">Banco</span><span class="gift-value">BBVA</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -684,7 +702,9 @@ es: {
     q3:"¿Hasta cuándo puedo confirmar?",
     a3:"Necesitamos que confirméis antes del 15 de mayo de 2027 para poder cerrar todos los detalles con la finca a tiempo. Os agradeceríamos muchísimo, por favor, que confirméis lo antes posible.",
     q4:"¿Cómo llego a la finca?",
-    a4:"La forma más sencilla es en el autobús que pondremos desde la basílica (más información en la sección de arriba). Si preferís ir por vuestra cuenta, la Finca de San Antonio está en la Carretera M-618, Km. 15, Hoyo de Manzanares."
+    a4:"La forma más sencilla es en el autobús que pondremos desde la basílica (más información en la sección de arriba). Si preferís ir por vuestra cuenta, la Finca de San Antonio está en la Carretera M-618, Km. 15, Hoyo de Manzanares.",
+    q5:"¿Os apetece hacernos un regalo?",
+    a5:"Con que vengáis ya nos hacéis el mejor regalo. Pero si os apetece tener un detalle con nosotros, aquí tenéis nuestros datos:"
   },
   rsvp:{
     eyebrow:"No falta mucho",
@@ -716,6 +736,7 @@ es: {
     errAttend:"Indica si podrás venir.",
     errSave:"No hemos podido guardar tu respuesta. Inténtalo de nuevo."
   },
+  regalo:{iban:"IBAN", banco:"Banco"},
   footer:{admin:"Panel de confirmaciones (privado)"},
   admin:{title:"Confirmaciones recibidas", close:"Cerrar"}
 },
@@ -762,7 +783,9 @@ en: {
     q3:"By when do I need to RSVP?",
     a3:"Please confirm by May 15, 2027 so we can finalize all the details with the venue in time. We'd really appreciate it if you could confirm as soon as possible, please.",
     q4:"How do I get to the venue?",
-    a4:"The easiest way is the bus we'll be organizing from the basilica (see the section above). If you'd rather drive, Finca de San Antonio is located at Carretera M-618, Km. 15, Hoyo de Manzanares."
+    a4:"The easiest way is the bus we'll be organizing from the basilica (see the section above). If you'd rather drive, Finca de San Antonio is located at Carretera M-618, Km. 15, Hoyo de Manzanares.",
+    q5:"Would you like to give us a gift?",
+    a5:"Having you there is already the best gift. But if you'd like to give us something, here are our details:"
   },
   rsvp:{
     eyebrow:"Not long to go now",
@@ -794,6 +817,7 @@ en: {
     errAttend:"Please let us know if you can make it.",
     errSave:"We couldn't save your response. Please try again."
   },
+  regalo:{iban:"IBAN", banco:"Bank"},
   footer:{admin:"RSVP dashboard (private)"},
   admin:{title:"RSVPs received", close:"Close"}
 },
@@ -840,7 +864,9 @@ pl: {
     q3:"Do kiedy mogę potwierdzić obecność?",
     a3:"Prosimy o potwierdzenie do 15 maja 2027 roku, abyśmy mogli na czas dopiąć wszystkie szczegóły z miejscem przyjęcia. Będziemy bardzo wdzięczni, jeśli uda się potwierdzić jak najwcześniej.",
     q4:"Jak dojechać na miejsce?",
-    a4:"Najprościej skorzystać z autobusu, który zorganizujemy spod bazyliki (więcej informacji w sekcji powyżej). Jeśli wolicie dojechać sami, Finca de San Antonio znajduje się przy Carretera M-618, Km. 15, Hoyo de Manzanares."
+    a4:"Najprościej skorzystać z autobusu, który zorganizujemy spod bazyliki (więcej informacji w sekcji powyżej). Jeśli wolicie dojechać sami, Finca de San Antonio znajduje się przy Carretera M-618, Km. 15, Hoyo de Manzanares.",
+    q5:"Chcielibyście sprawić nam prezent?",
+    a5:"Wasza obecność to już najlepszy prezent. Ale jeśli chcielibyście nas czymś obdarować, oto nasze dane:"
   },
   rsvp:{
     eyebrow:"Już niedługo",
@@ -872,6 +898,7 @@ pl: {
     errAttend:"Zaznacz, czy będziesz mógł/mogła przyjść.",
     errSave:"Nie udało się zapisać odpowiedzi. Spróbuj ponownie."
   },
+  regalo:{iban:"IBAN", banco:"Bank"},
   footer:{admin:"Panel potwierdzeń (prywatny)"},
   admin:{title:"Otrzymane potwierdzenia", close:"Zamknij"}
 }
